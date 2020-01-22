@@ -3,6 +3,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+from googletrans import Translator
 
 import duoconfig
 
@@ -15,6 +16,20 @@ import duoconfig
 #div data-test="challenge-translate" is a translate the sentence problem
 #div data-test="challenge-form" is a fill in the blank but more conjugation based
 #div data-test="challenge-name" is a single word translate
+
+
+def switch(challenge, driver):
+    switcher = {
+        'challenge-select': select,
+        'challenge-judge': judge,
+        'challenge-listenTap': listen_tap,
+        'challenge-listen': listen,
+        'challenge-tapComplete': tap_complete,
+        'challenge-translate': translate,
+        'challenge-form': form,
+        'challenge-name': name
+    }
+    return switcher.get(challenge, 'invalid')(driver)
 
 
 def main():
@@ -53,8 +68,78 @@ def start_lesson(driver):
         EC.presence_of_element_located(
             (By.XPATH, "//div[@class='_1cw2r']/button[@data-test='player-next']"))).click()
 
+    check_question_type(driver)
 
-#def answer_question():
+
+def check_question_type(driver):
+    challenge = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, "//div[@class='_1Y5M_ _2szQy _27r1x']")))
+    challenge = challenge.get_attribute('data-test').split()
+
+    print(challenge[1])
+    switch(challenge[1], driver)
+
+
+def get_question(driver):
+    question = driver.find_element_by_xpath("//h1[@data-test='challenge-header']/span")
+    return question
+
+
+def get_options(driver):
+    choices = driver.find_elements_by_xpath("//span[@class='_1xgIc']/span")
+    return choices
+
+
+def select(driver):
+    translator = Translator()
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(translator.translate(choice.get_attribute('innerHTML'), dest='en'))
+
+
+
+
+
+def judge(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
+
+
+def listen_tap(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
+
+
+def listen(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
+
+
+def tap_complete(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
+
+
+def translate(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
+
+
+def form(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
+
+
+def name(driver):
+    print(get_question(driver).get_attribute('innerHTML'))
+    for choice in get_options(driver):
+        print(choice.get_attribute('innerHTML'))
 
 
 main()
