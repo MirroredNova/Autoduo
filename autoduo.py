@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from googletrans import Translator
 
+import re
 import duoconfig
 
 #there are different types of challenges
@@ -62,12 +63,10 @@ def login(driver):
 def start_lesson(driver):
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located(
-            (By.XPATH, "//div[@class='_3ykek']/div[@class='_3bahF _3J-7b']/a[@data-test='global-practice']"))).click()
+            (By.XPATH, "//div[@class='_3bahF _3J-7b']/a[@data-test='global-practice']")))
 
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located(
-            (By.XPATH, "//div[@class='_1cw2r']/button[@data-test='player-next']"))).click()
-
+    driver.get(duoconfig.base_url + 'practice')
+    next_button(driver)
     check_question_type(driver)
 
 
@@ -85,61 +84,58 @@ def get_question(driver):
     return question
 
 
-def get_options(driver):
-    choices = driver.find_elements_by_xpath("//span[@class='_1xgIc']/span")
-    return choices
+def next_button(driver):
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located(
+            (By.XPATH, "//div[@class='_1cw2r']/button[@data-test='player-next']"))).click()
 
 
 def select(driver):
     translator = Translator()
-    print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(translator.translate(choice.get_attribute('innerHTML'), dest='en'))
+    #“”
+    question = get_question(driver).get_attribute('innerHTML')
+    question = question.split("”")
+    question = question[0].split("“")
 
-
+    choices = driver.find_elements_by_xpath("//span[@class='_1xgIc']/span")
+    for choice in choices:
+        translation = translator.translate(choice.get_attribute('innerHTML'), dest="en")
+        result = re.search('text=(.*), pronunciation', str(translation))
+        if result.group(1) == question[1]:
+            print(result.group(1))
+            choice.click()
+            next_button(driver)
+            next_button(driver)
+            check_question_type(driver)
 
 
 
 def judge(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 def listen_tap(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 def listen(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 def tap_complete(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 def translate(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 def form(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 def name(driver):
     print(get_question(driver).get_attribute('innerHTML'))
-    for choice in get_options(driver):
-        print(choice.get_attribute('innerHTML'))
 
 
 main()
