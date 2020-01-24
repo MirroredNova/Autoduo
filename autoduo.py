@@ -18,6 +18,8 @@ import duoconfig
 #div data-test="challenge-form" is a fill in the blank but more conjugation based
 #div data-test="challenge-name" is a single word translate
 
+translator = Translator()
+
 
 def switch(challenge, driver):
     switcher = {
@@ -91,27 +93,37 @@ def next_button(driver):
 
 
 def select(driver):
-    translator = Translator()
     #“”
     question = get_question(driver).get_attribute('innerHTML')
     question = question.split("”")
     question = question[0].split("“")
 
+    print(question)
+
     choices = driver.find_elements_by_xpath("//span[@class='_1xgIc']/span")
     for choice in choices:
         translation = translator.translate(choice.get_attribute('innerHTML'), dest="en")
         result = re.search('text=(.*), pronunciation', str(translation))
+        print(result)
         if result.group(1) == question[1]:
-            print(result.group(1))
             choice.click()
             next_button(driver)
             next_button(driver)
             check_question_type(driver)
 
+    #if there was no match ->
 
 
 def judge(driver):
     print(get_question(driver).get_attribute('innerHTML'))
+    prompt = driver.find_element_by_xpath("//div[@class='maOx8 vim67 _1QbP-']/div[@class='KRKEd _3xka6']")
+
+    choices = driver.find_elements_by_xpath("//div[@data-test='challenge-judge-text']")
+    for choice in choices:
+        translation = translator.translate(choice.get_attribute('innerHTML'), dest="en")
+        result = re.search('text=(.*), pronunciation', str(translation))
+        print(result)
+
 
 
 def listen_tap(driver):
